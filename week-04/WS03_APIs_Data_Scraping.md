@@ -2,23 +2,23 @@
 
 ## Set up a Twitter Application
 
-This week we are going to scrape data from the Twitter API and make some plots! We are going to use the Twitter REST API, which lets us query and retreive samples of Tweets. To do this, you need API keys that are associated with your account. Your API keys are secret and unique to you and only you, and they gives you access to Twitter data through the API.
+This week we are going to scrape data from the Twitter API and make some plots! We are going to use the Twitter REST API, which lets us query and retrieve samples of Tweets. To do this, you need API keys that are linked to an App that you create through your Twitter account. Your API keys are secret and unique to you and only you, and they gives you access to Twitter data through the API.
 
-There are a couple of ways to get Twitter data, the REST API is just one of them. The others are to set up a Streamer (which streams real time tweets), or to access the Firehose (this means everything!). Read [this article](https://brightplanet.com/2013/06/twitter-firehose-vs-twitter-api-whats-the-difference-and-why-should-you-care/) for a nice comparison between the methods.
+There are a couple of ways to get Twitter data; the REST API is just one of them. The others are to set up a Streamer (which streams real time tweets), or to access the Firehose (this means everything!). Read [this article](https://brightplanet.com/2013/06/twitter-firehose-vs-twitter-api-whats-the-difference-and-why-should-you-care/) to compare these methods.
 
 The Twitter REST API is best place to start and what we will use in class. Follow the following steps to get your keys.
 
-* Create a twitter account if you do not already have one.
-* Go to [https://apps.twitter.com/](https://apps.twitter.com/) and log in with your twitter credentials.
-* Click **"Create New App"** in the upper right corner
-* Fill out the form, give it a name like **data_getter_yourname** and a description. The form will ask for a website---good thing we made one of these a few week ago! Use the github.io page you created as the URL. Leave the Callback URL field blank. Agree to the terms and click "Create your Twitter application".
-* In the next page, click on **Keys and Access Tokens** tab, and copy your "Consumer Key (API Key)" and "Consumer Key (API Secret)".
++ Create a Twitter account if you do not already have one.
++ Go to [https://apps.twitter.com/](https://apps.twitter.com/) and log in with your Twitter credentials.
++ Click **"Create New App"** in the upper right corner
++ Fill out the form, give it a name like 'data_getter_yourname' and a description. The form will ask for a website---good thing we made one of these a few week ago! Use your GitHub Pages site as the URL. Leave the Callback URL field blank. Agree to the terms and click "Create your Twitter application".
++ In the next page, click on **Keys and Access Tokens** tab, and copy your "Consumer Key (API Key)" and "Consumer Key (API Secret)".
 
 ## Create a Python script to store your Twitter keys
 
-We need a Python file that will contain the **Twitter** keys. Open your text editor, and in the materials for the week, *PASTE* these keys into a new file and save it as `twitter-keys.py`. You need to define two string variables, one for each key. Your code should look like this:
+We need to create a Python file (`.py`) that will contain the Twitter keys. Open your text editor, and in the materials for the week, *PASTE* these keys into a new file and save it as `twitter-keys.py`. You need to define two string variables, one for each key. Your code should look like this:
 
-```
+```python
 # In the file you should define two variables (these must be strings!)
 api_key = "your twitter key"
 api_secret = "your twitter secret"
@@ -30,7 +30,7 @@ Using this method, we can then import the keys and use them on a repeated basis,
 
 Here's the thing---it's **never** a good idea to include these keys in a publicly accessible script or webpage. This means that these keys should not find their way to GitHub. One way to keep them private is importing the keys as a variable from a separate, untracked file. We can make sure to avoid accidentally pushing the file by adding its name to a `.gitignore` file.
 
-Create a new file in the root directory of your forked repo. Save this file as .gitignore. Add the following lines to this file:
+Create a new file in the root directory of your forked repo. Save this file as `.gitignore`. Add the following lines to this file:
 
 ```sh
 week-04/**/twitter_keys.py
@@ -54,7 +54,7 @@ import json
 import time
 import threading
 from datetime import datetime
-from twython import Twython
+import tweepy
 
 # Imports the keys from the python file
 from twitter_key import api_key, api_secret
@@ -96,7 +96,7 @@ Next, let's do a search and get some tweets! Specifically, set up a function tha
 
 The **Search API** can take many parameters for querying tweets. Twitter has a nice page of what you can use as query parameters here [https://dev.twitter.com/rest/public/search](https://dev.twitter.com/rest/public/search).
 
-The Twitter API has rate limits that limit how quickly you can download data. This is to try to lighten the load on their servers. We are using the Search API with **OAuth2 (Application) Access** - which limits us to **450 in 15 minutes** Read about the [Rate Limits](https://dev.twitter.com/rest/public/rate-limiting) here. This means, in our following steps, always follow the guideline that you will not be able to get more than 450 tweets in 15 minutes, or Twitter might lock your access.
+The Twitter API has rate limits that limit how quickly you can download data. This is to try to lighten the load on their servers. We are using the Search API with **OAuth2 (Application) Access** - which limits us to **450 in 15 minutes** Read about the [Rate Limits](https://dev.twitter.com/rest/public/rate-limiting) here. This means, in our following steps, always follow the guideline that you will not be able to get more than 450 tweets in 15 minutes, or Twitter might lock your access. Rate limits are the wooooooorst.
 
 
 ```python
@@ -338,29 +338,3 @@ Exporting your dataset is easy, you can use **to_csv()**. This [Stack Exchange](
 ```python
 df_tweets.to_csv('twitter_data.csv', sep=',', encoding='utf-8')
 ```
-
-### Problem Set 3 - Extend What You Have Learned
-
-Now that you know how to scrape data from Twitter, let's extend the exercise a little so you can show us what you know. This time you will set up the scraper to get data around MIT and scrape data for 20 minutes. Then you will visualize it with  and visualize. Think about what you would need to change to do that.
-
-Once you have the new JSON file of Boston tweets you should a pie chart and scatterplot of your collected tweets. When you are creating your dataset, you should get at least two different attributes returned by the Twitter API (we got many of them above, so base it off of that example). Atleast one of them should be the tweet id. Make sure you remove and duplicate tweets (if any). Expanding on the above, then save the data to a CSV.
-
-Make sure you get your own Twitter Key.
-
-#### Deliverables
-
-**1** - Using the Twitter REST API, collect Tweets from Boston for 30 min. Note how you set the time in the above example (in the **run_all()** function), it was in seconds. How would you do that here?
-
-**2** - Create a Pie Chart showing a summary of tweets by user location. Please clean up the data so that multiple variations of the same location name are replaced with one variation.
-
-**3** - Create a Scatterplot showing all of the tweets that had a latitude and longitude.
-
-**4** - Pick a search term, such as *Trump* or *#Trump* and collect 15 minutes of tweets on it. Use the same lat/lon for Boston as you used above.
-
-**5** - Export the entirety of your scraped Twitter datasets (one with a search term, one without) to two CSV files. We will be checking this CSV file for duplicates. So clean your file.  
-
-### What to Give Us on Stellar
-
-1 - Create a new Jupyter notebook that contains your scraper code. You can copy much of this one, but customize it. Submit the new Jupyter notebook, which includes your pie chart and scatterplot.
-
-2 - Your final CSV files.

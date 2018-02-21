@@ -9,13 +9,18 @@ Python is a valuable scripting language for data analysis and... well, just abou
 First, check whether you have Python installed. Open the Terminal or Windows Command Prompt and type the following command:
 
 ```sh
-python -V
+python --version
 ```
 You should see something like `Python 3.6.3`. If a Python 2.x.x version shows up, type `python3 -V`. If the console prints a Python `3.6.x` version, you're set. Otherwise, you'll need to install Python 3.
 
 ### Installing Python 3.6.x
 
-Navigate to the [3.6.3 release page](https://www.python.org/downloads/release/python-363/) and select the appropriate installer for your operating system. Install Python using the default settings. Close any open Terminal or Command Prompt windows and reopen the application. Now type `python -V`. This may still cause a Python 2.x.x version to appear; if this is the case, type `python3 -V`. We now have Python 3 and can execute it from the command line!
+Navigate to the [3.6.3 release page](https://www.python.org/downloads/release/python-363/) and select the appropriate installer for your operating system.
+
++ On OS X, this is [Mac OS X 64-bit/32-bit installer](https://www.python.org/downloads/release/python-360/).
++ On Windows, this is [Windows x86-64 executable installer](https://www.python.org/downloads/release/python-360/).
+
+Install Python. **On Windows, you should ensure that "Add Python 3.6 to PATH" is checked.** Close any open Terminal or Command Prompt windows and reopen the application. Now type `python -V`. This may still cause a Python 2.x.x version to appear; if this is the case, type `python3 -V`. We now have Python 3 and can execute it from the command line!
 
 **Note**: If you ran Python 3 using the `python3` command, you'll use this in every instance below where you're instructed to type `python`.
 
@@ -67,7 +72,16 @@ python get-pip.py
 
 This will install `pip` on your system. Close your command line windows and reopen them. You should then be able to execute pip; type `pip -V` to see which version you have installed. Much like with Python, if you have installations of both Python 2 and Python 3 on the same machine, you'll have to use the `pip3` command to install Python 3 packages.
 
-### Installing `virtualenv`
+### Install
+
+We installed Hydrogen above, which will allow you to run Python scripts from within Atom. However, if you try to do this now, you're likely to be in trouble; we have yet to install a **kernel**. Basically, a kernel is a program that runs your code. One very common kernel is `ipython`, which we can install using `pip` in the same way that we installed `virtualenv` above. The only difference is that we're now working within a virtual environment, meaning that any packages you install will be installed in the virtual environment, rather than in your global Python packages.
+
+```sh
+# Remember that you may need to use pip3
+pip install ipython
+```
+
+### Install `virtualenv`
 
 Now we're going to install `virtualenv` using `pip`.
 
@@ -87,7 +101,11 @@ Once we've installed `virtualenv`, we can create a new virtual environment using
 ```sh
 mkdir ~/.venvs
 virtualenv --system-site-packages ~/.venvs/bdvs
+
+# On Mac or Linux...
 . ~/.venvs/bdvs/bin/activate
+# On Windows...
+. ~/.venvs/bdvs/Scripts/activate
 ```
 
 First we create a new folder to hold our virtual environments. Next, we create a new virtual environment in the `bdvs` subfolder of our new `.venvs` subdirectory. We're also telling `virtualenv` that we want this environment to inherit its packages from the Python system installation (this is the role of the `--system-site packages` option). Finally, we activate the virtual environment using the `.` operator, which tells the shell to source from a provided path.
