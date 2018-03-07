@@ -141,7 +141,7 @@ def get_tweets(
     tweet_max = 150,
     since_id = None,
     max_id = -1,
-    write = False
+    write = True
   ):
   tweet_count = 0
   # all_tweets = pd.DataFrame()
@@ -197,14 +197,14 @@ def get_tweets(
 # Set a Lat Lon
 latlng = '42.359416,-71.093993' # Eric's office (ish)
 # Set a search distance
-radius = '1mi'
+radius = '5mi'
 # See tweepy API reference for format specifications
 geocode_query = latlng + ',' + radius
 # set output file location
-file_name = 'data/tweets.json'
+file_name = 'data/tweets_Pset03_3.json'
 # set threshold number of Tweets. Note that it's possible
 # to get more than one
-t_max = 200
+t_max = 50
 
 get_tweets(
   geo = geocode_query,
@@ -212,6 +212,14 @@ get_tweets(
   write = True,
   out_file = file_name
 )
+
+df2 = pd.read_json('data/tweets_Pset03_3.json')
+df2.shape
+df
+df2['text'].unique
+df['location'].unique()
+
+
 ```
 
 This function will run as is, allowing you to download Tweets to a `.json` file---give it a go! However, we might also want to download it into a more Python-legible format so that we can manipulate it and analyze it.
@@ -236,6 +244,8 @@ def parse_tweet(tweet):
   p['user_id'] = tweet.user.id_str
   p['time'] = str(tweet.created_at)
   return p
+
+
 ```
 
 We can now uncomment the lines that read `all_tweets = pd.DataFrame()`, `all_tweets = all_tweets.append(parse_tweet(tweet), ignore_index = True)`, and `return all_tweets` in our `get_tweets` function. These lines...
@@ -253,6 +263,8 @@ tweets = get_tweets(
   write = True,
   out_file = file_name
 )
+
+
 ```
 
 ## Reloading Downloaded Data
@@ -262,7 +274,7 @@ We're about to start cleaning our data; cleaning is not an exact science, and so
 We can always reload our data by running the below command, where `df` is an arbitrary variable name and `path/example_json.json` is the path to, for example, your Tweets:
 
 ```python
-df = pd.read_json('path/example_json.json')
+df3 = pd.read_json('data/tweets_Pset03_3.json')
 ```
 
 ## Let's Explore the Tweets
@@ -287,11 +299,11 @@ Next let's summarize and group our data, and create some plots.
 When we say 'location', we're not referring to the Tweet's lat/long; instead, we're referring to the self-reported location provided by a user. 'Self-reported' is a compound word that gives data scientists rashes---it turns out that when you give people the ability to input their own location (or anything else for that matter), you'll almost always get an assortment of mixed conventions, misspellings, and 'creative' responses!
 
 ```python
-tweets.dtypes
+df3.dtypes
 ```
 
 ```python
-tweets['location'].unique()
+df3['text'].unique()
 ```
 
 Now let's do some grouping and sorting. We are using Pandas to do our analysis, much like last week.
