@@ -139,7 +139,7 @@ def tif2array(tif_path, band=1):
     B1_f = B1.astype(float)
     type(B1_f)
     return B1_f
-tif2array(tif_path)
+B1_f = tif2array(tif_path)
 
 tirs = tif2array(tif_path, 10)
 meta_text = os.path.join(DATA, "LC08_L1TP_012031_20140606_20170305_01_T1_MTL.txt")
@@ -163,7 +163,7 @@ def retrieve_meta(meta_text):
 #     matching = [process_string(s) for s in meta if any(xs in s for xs in matchers)]
 #     return matching
 
-
+meta_full = retrieve_meta(meta_text)
 
 meta_full
 
@@ -180,7 +180,7 @@ def rad_calc(tirs, var_list):
     plt.colorbar()
     return rad
 
-rad_calc(tirs, meta_full)
+rad = rad_calc(tirs, meta_full)
 print(rad)
 
 
@@ -195,10 +195,11 @@ def bt_calc(rad, var_list):
     plt.colorbar()
     return bt
 
-bt_calc(rad, meta_full)
+bt = bt_calc(rad, meta_full)
 red = tif2array(tif_path, 4)
 nir = tif2array(tif_path, 5)
 
+ndvi = ndvi_calc(red, nir)
 
 def pv_calc(ndvi):
     """
@@ -207,8 +208,11 @@ def pv_calc(ndvi):
     pv = (ndvi - 0.2) / (0.5 - 0.2) ** 2
     plt.imshow(pv, cmap="YlGn")
     plt.colorbar()
+    return pv
 
-pv_calc(ndvi)
+pv = pv_calc(ndvi)
+
+emis = emissivity_calc(pv, ndvi)
 
 def lst_calc(location):
     """
@@ -241,6 +245,7 @@ def lst_calc(location):
     plt.colorbar()
     return lst
 
+lst = lst_calc(DATA)
 
 ```
 
@@ -261,10 +266,21 @@ According to the [USGS Landsat documentation](https://landsat.usgs.gov/collectio
 Write a function that reclassifies an input Numpy array based on values stored in the BQA. The function should reclassify input data in such a way that pixels, *except for those that are clear* (for example, 2720), are assigned a value of `nan`. Use the `emissivity_calc` function as a model! We're doing something similar here! Your code will look like this:
 
 ```python
-def cloud_filter(array, bqa):
+bqa_name = "LC08_L1TP_012031_20140606_20170305_01_T1_BQA.TIF"
+bqa_path = os.path.join(DATA, bqa_name)
+bqa_tif = tif2array(bqa_path, 1)
+
+
+
+def cloud_filter(array):
     array_dest = array.copy()
-    array_dest[np.where((bqa != <a certain value>) & (bqa != <another certain value>)) ] = 'nan'
+    bqa_cloud = [2800,2804,2808,2812,6896,6900,6904,6908]
+    bqa_cloud_sh = [2976, 2980, 2984, 2988, 3008, 3012, 3016, 3020, 7072, 7076, 7080, 7084, 7104, 7108, 7112, 7116]
+    array_dest[np.where((array != np.array(bqa_cloud)) & (array != np.array(bqa_cloud_sh))) ] = 'nan'
     return array_dest
+
+lst_cloud = cloud_filter(lst)
+
 ```
 
 You should simply be able to revise the above function, making your criteria test for `bqa` values not equal to 2720, 2724, 2728, 2732.
@@ -274,6 +290,9 @@ def cloud_filter(array, bqa):
     """
     Filters out clouds and cloud shadows using values of BQA.
     """
+    array_filt = array.copy()
+    bqa_clear = [2720,2724,2728,2732]
+    array_filt[np.where(array =! np.array(bqa_clear))] = 'nan'
 ```
 
 ## Write Your Filtered Arrays as `.tifs`
@@ -282,8 +301,10 @@ You should now be able to write your NDVI and LST arrays as GeoTIFFs. For exampl
 
 ```python
 tirs_path = os.path.join(DATA, 'LC08_L1TP_012031_20170716_20170727_01_T1_B10.TIF')
-out_path = os.path.join(DATA, 'huntley_ndvi_20170716.tif')
-array2tif(tirs_path, out_path, lst_filter)
+out_path = os.path.join(DATA, 'arnell_ndvi_20140606.tif')
+array2tif(tif_path, out_path, lst_cloud)
+array2tif(tif_path, out_path, ndvi)
+
 ```
 
 The reason you have to specify the `tirs_path` is that GDAL looks to another raster file to obtain dimensions, etc. We could use any of our input rasters - the TIRS band was chosen somewhat arbitrarily.
